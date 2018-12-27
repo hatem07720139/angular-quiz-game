@@ -1,0 +1,34 @@
+<mat-grid-list
+  cols="1"
+  rowHeight="200px"
+  [style.background]="'#e6e6e6'"
+  *ngIf="(questions$ | async) as questions"
+>
+  <div *ngIf="questions.pending">LOADING DATA...</div>
+  <div *ngIf="questions.error">{{ questions.error }}</div>
+
+  <div *ngIf="questions.data">
+    <mat-grid-tile *ngFor="let question of questions.data.results">
+      <mat-card class="example-card">
+        <mat-card-header>
+          <div mat-card-avatar class="example-header-image"></div>
+          <mat-card-title>Category: {{ question.category }} </mat-card-title>
+          <mat-card-subtitle> Difficulty: {{ question.difficulty }} </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ question.question }}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary">{{ question.correct_answer }}</button>
+          <button
+            mat-raised-button
+            color="primary"
+            *ngFor="let incorrect_answers of question.incorrect_answers"
+          >
+            {{ incorrect_answers }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </mat-grid-tile>
+  </div>
+</mat-grid-list>

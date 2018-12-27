@@ -10,11 +10,19 @@
   flex: 1 1 auto;
 }
 
-.example-card {
-  max-width: 400px;
-}
-
 .example-header-image {
   background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg');
   background-size: cover;
 }
+
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: ghostwhite;
+}
+
+// .navbar-offset {
+//   margin-top: 100px;
+// }
