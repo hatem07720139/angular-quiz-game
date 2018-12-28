@@ -1,16 +1,16 @@
+import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
+import { QuestionActions } from './questions.actions';
 import { QuestionActionTypes } from './questions.constants';
 import { Questions } from './questions.model';
-import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { QuestionActions } from './questions.actions';
 
 export interface QuestionsState extends EntityState<Questions> {
-  data: any;
+  data: Questions;
   pending: boolean;
   error: string | null;
 }
 
 export function selectAnswer(data: Questions): string {
-  return data.results[0].category;
+  return data[0].category;
 }
 
 export const questionsAdapter: EntityAdapter<Questions> = createEntityAdapter<Questions>({
@@ -18,7 +18,7 @@ export const questionsAdapter: EntityAdapter<Questions> = createEntityAdapter<Qu
 });
 
 export const initialState: QuestionsState = questionsAdapter.getInitialState({
-  data: {},
+  data: [],
   pending: false,
   error: null
 });

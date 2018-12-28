@@ -1,34 +1,27 @@
-<mat-grid-list
-  cols="1"
-  rowHeight="200px"
-  [style.background]="'#e6e6e6'"
-  *ngIf="(questions$ | async) as questions"
->
-  <div *ngIf="questions.pending">LOADING DATA...</div>
-  <div *ngIf="questions.error">{{ questions.error }}</div>
+<div class="container">
+  <div class="row">
+    <div class="col-12" *ngIf="(questions$ | async) as questions">
+      <div *ngIf="questions.pending" class="center-complete">LOADING DATA...</div>
+      <div *ngIf="questions.error">{{ questions.error }}</div>
 
-  <div *ngIf="questions.data">
-    <mat-grid-tile *ngFor="let question of questions.data.results">
-      <mat-card class="example-card">
-        <mat-card-header>
-          <div mat-card-avatar class="example-header-image"></div>
-          <mat-card-title>Category: {{ question.category }} </mat-card-title>
-          <mat-card-subtitle> Difficulty: {{ question.difficulty }} </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <p>{{ question.question }}</p>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button color="primary">{{ question.correct_answer }}</button>
-          <button
-            mat-raised-button
-            color="primary"
-            *ngFor="let incorrect_answers of question.incorrect_answers"
-          >
-            {{ incorrect_answers }}
-          </button>
-        </mat-card-actions>
-      </mat-card>
-    </mat-grid-tile>
+      <div *ngIf="questions.data">
+        <div class="card my-3" *ngFor="let question of questions?.data; let i = index">
+          <div class="question-number">#{{ i + 1 }}</div>
+          <div class="card-body">
+            <h5 class="card-title">Category: {{ question.category }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Difficulty: {{ question.difficulty }}</h6>
+            <p class="card-text">{{ question.question }}</p>
+            <a href="#" class="btn btn-primary mr-2 mb-2" *ngFor="let answer of question.answers">{{
+              answer.answer
+            }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 text-center my-5">
+      <a [routerLink]="['/results']" class="btn btn-primary" [ngClass]="{ disabled: false }">
+        Give me my results!
+      </a>
+    </div>
   </div>
-</mat-grid-list>
+</div>

@@ -1,17 +1,6 @@
 import { LayoutModule } from '@angular/cdk/layout';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import {
-  MatButtonModule,
-  MatCardModule,
-  MatCheckboxModule,
-  MatGridListModule,
-  MatIconModule,
-  MatListModule,
-  MatProgressSpinnerModule,
-  MatSidenavModule,
-  MatToolbarModule
-} from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EffectsModule } from '@ngrx/effects';
@@ -26,25 +15,17 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { QuestionsComponent } from './components/questions/questions.component';
 import { QuestionsEffects } from './components/questions/questions.effects';
 import { QuestionsService } from './components/questions/questions.service';
+import { ResultsComponent } from './components/results/results.component';
 import { metaReducers, reducers } from './reducers';
 
 @NgModule({
-  declarations: [AppComponent, NavbarComponent, QuestionsComponent],
+  declarations: [AppComponent, NavbarComponent, QuestionsComponent, ResultsComponent],
   imports: [
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
     LayoutModule,
-    MatToolbarModule,
-    MatSidenavModule,
-    MatIconModule,
-    MatGridListModule,
-    MatListModule,
-    MatProgressSpinnerModule,
     StoreModule.forRoot(reducers, { metaReducers }),
     StoreRouterConnectingModule.forRoot(),
     !environment.production ? StoreDevtoolsModule.instrument() : [],

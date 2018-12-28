@@ -1,18 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
-@import "~normalize.css/normalize.css";
+@import '~bootstrap/dist/css/bootstrap.min.css';
 
-.example-icon {
-  padding: 0 14px;
-}
-
-.example-spacer {
-  flex: 1 1 auto;
-}
-
-.example-header-image {
-  background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg');
-  background-size: cover;
+.center-complete {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 56px);
 }
 
 .loading-screen {
@@ -23,6 +16,6 @@
   background: ghostwhite;
 }
 
-// .navbar-offset {
-//   margin-top: 100px;
-// }
+.navbar-offset {
+  margin-top: 56px;
+}
