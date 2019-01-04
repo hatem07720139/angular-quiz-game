@@ -1,5 +1,7 @@
 export enum QuestionActionTypes {
   GetQuestionsPending = 'GetQuestionsPending',
   GetQuestionsSuccess = 'GetQuestionsSuccess',
-  GetQuestionsError = 'GetQuestionsError'
+  GetQuestionsError = 'GetQuestionsError',
+  StartSelectAnswer = 'StartSelectAnswer',
+  SelectAnswer = 'SelectAnswer'
 }

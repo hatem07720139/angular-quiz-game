@@ -5,6 +5,13 @@ export interface Question {
   question: string;
   correct_answer: string;
   incorrect_answers: string[];
+  answers?: Answer[];
+}
+
+interface Answer {
+  answer: string;
+  isCorrect: boolean;
+  answered?: boolean;
 }
 
 export interface Questions extends Array<Question> {}

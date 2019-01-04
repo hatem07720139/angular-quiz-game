@@ -18,4 +18,19 @@ export class GetQuestionsError implements Action {
   constructor(public payload: { error: string }) {}
 }
 
-export type QuestionActions = GetQuestionsPending | GetQuestionsSuccess | GetQuestionsError;
+export class StartSelectAnswer implements Action {
+  readonly type = QuestionActionTypes.StartSelectAnswer;
+}
+
+export class SelectAnswer implements Action {
+  readonly type = QuestionActionTypes.SelectAnswer;
+
+  constructor(public payload: { questionID: number; buttonID: number }) {}
+}
+
+export type QuestionActions =
+  | GetQuestionsPending
+  | GetQuestionsSuccess
+  | GetQuestionsError
+  | StartSelectAnswer
+  | SelectAnswer;

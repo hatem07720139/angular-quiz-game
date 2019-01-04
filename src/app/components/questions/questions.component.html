@@ -1,19 +1,33 @@
 <div class="container">
   <div class="row">
     <div class="col-12" *ngIf="(questions$ | async) as questions">
-      <div *ngIf="questions.pending" class="center-complete">LOADING DATA...</div>
+      <div *ngIf="questions.pending" class="center-complete">
+        <img
+          src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif"
+          alt="Double Ring Loading Spinner"
+        />
+      </div>
       <div *ngIf="questions.error">{{ questions.error }}</div>
 
       <div *ngIf="questions.data">
-        <div class="card my-3" *ngFor="let question of questions?.data; let i = index">
-          <div class="question-number">#{{ i + 1 }}</div>
+        <div class="card my-3" *ngFor="let question of questions?.data">
+          <div class="question-number">#{{ question.id + 1 }}</div>
           <div class="card-body">
             <h5 class="card-title">Category: {{ question.category }}</h5>
             <h6 class="card-subtitle mb-2 text-muted">Difficulty: {{ question.difficulty }}</h6>
             <p class="card-text">{{ question.question }}</p>
-            <a href="#" class="btn btn-primary mr-2 mb-2" *ngFor="let answer of question.answers">{{
-              answer.answer
-            }}</a>
+            <a
+              href="javascript:void(0)"
+              class="btn mr-2 mb-2"
+              *ngFor="let answer of question.answers; let buttonID = index"
+              [ngClass]="{
+                'btn-primary': !answer.answered,
+                'btn-danger': !answer.isCorrect && answer.answered,
+                'btn-success': answer.isCorrect && answer.answered
+              }"
+              (click)="clickedAnswer(question.id, buttonID)"
+              >{{ answer.answer }}</a
+            >
           </div>
         </div>
       </div>
