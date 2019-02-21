@@ -20,12 +20,12 @@ export class QuestionsEffects {
     '&amp;': '&'
   };
 
-  constructor(private actions$: Actions, private questionsService: QuestionsService) {}
+  constructor(private actions$: Actions, private questionsService: QuestionsService) { }
 
   @Effect() getQuestions$: Observable<Action> = this.actions$.pipe(
     ofType(QuestionActionTypes.GetQuestionsPending),
-    switchMap(() =>
-      this.questionsService.getAllQuestions().pipe(
+    switchMap((action: any) => this.questionsService.getAllQuestions(action.payload.numberOfQuestions, action.payload.difficulty)
+      .pipe(
         map((questions: any) => {
           const modified: Questions = questions.results.map((elem, i) => {
             const tmp = {

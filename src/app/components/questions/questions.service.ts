@@ -7,10 +7,10 @@ import { Questions } from './questions.model';
 export class QuestionsService {
   constructor(private http: HttpClient) {}
 
-  public getAllQuestions() {
-    const url = 'https://opentdb.com/api.php?amount=10';
-    const response = this.http.get<Questions>(url).pipe(map((questions: Questions) => questions));
-    return response;
+  public getAllQuestions(numberOfQuestions: number, difficulty: string) {
+      const url = `https://opentdb.com/api.php?amount=${numberOfQuestions}&difficulty=${difficulty}`;
+      const response = this.http.get<Questions>(url).pipe(map((questions: Questions) => questions));
+      return response;
   }
 
   selectAnswer(dummy) {

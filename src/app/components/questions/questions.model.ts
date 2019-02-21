@@ -11,7 +11,7 @@ export interface Question {
 interface Answer {
   answer: string;
   isCorrect: boolean;
-  answered?: boolean;
+  selected?: boolean;
 }
 
 export interface Questions extends Array<Question> {}

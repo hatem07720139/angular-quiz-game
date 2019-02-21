@@ -1,39 +1,86 @@
 <div class="container">
   <div class="row">
-    <div class="col-12" *ngIf="(questions$ | async) as questions">
-      <div *ngIf="questions.pending" class="center-complete">
-        <img
-          src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif"
-          alt="Double Ring Loading Spinner"
-        />
-      </div>
-      <div *ngIf="questions.error">{{ questions.error }}</div>
+    <div class="col-12"
+         *ngIf="(questions$ | async) as questions">
 
-      <div *ngIf="questions.data">
-        <div class="card my-3" *ngFor="let question of questions?.data">
+      <div class="card my-3">
+        <div class="card-body">
+          <form>
+            <div class="row">
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="number-of-questions">Number of Questions</label>
+                  <input type="number"
+                         name="number-of-questions"
+                         id="number-of-questions"
+                         class="form-control"
+                         min="1"
+                         max="50"
+                         value="10"
+                         [ngModel]="numberOfQuestionsChanged"
+                         (ngModelChange)="onNumberOfQuestionsChange($event)">
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="difficulty">Difficulty</label>
+                  <select class="form-control"
+                          id="difficulty"
+                          (change)="onSelectDifficulty($event.target.value)">
+                    <option>easy</option>
+                    <option>medium</option>
+                    <option>hard</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <ng-container *ngIf="questions.pending">
+        <img src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif"
+             alt="Double Ring Loading Spinner"
+             class="center-loading-indicator" />
+      </ng-container>
+
+      <ng-container *ngIf="questions.error">{{ questions.error }}</ng-container>
+
+      <ng-container *ngIf="questions.data && !showErrorMessage">
+        <div class="card my-3"
+             *ngFor="let question of questions?.data">
           <div class="question-number">#{{ question.id + 1 }}</div>
           <div class="card-body">
             <h5 class="card-title">Category: {{ question.category }}</h5>
             <h6 class="card-subtitle mb-2 text-muted">Difficulty: {{ question.difficulty }}</h6>
             <p class="card-text">{{ question.question }}</p>
-            <a
-              href="javascript:void(0)"
-              class="btn mr-2 mb-2"
-              *ngFor="let answer of question.answers; let buttonID = index"
-              [ngClass]="{
-                'btn-primary': !answer.answered,
-                'btn-danger': !answer.isCorrect && answer.answered,
-                'btn-success': answer.isCorrect && answer.answered
+            <button class="btn mr-2 mb-2"
+                    *ngFor="let answer of question.answers; let buttonID = index"
+                    [ngClass]="{
+                'btn-secondary': !answer.selected,
+                'btn-danger': !answer.isCorrect && answer.selected,
+                'btn-success': answer.isCorrect && answer.selected
               }"
-              (click)="clickedAnswer(question.id, buttonID)"
-              >{{ answer.answer }}</a
-            >
+                    (click)="clickedAnswer(question.id, buttonID, $event)"
+                    [disabled]="answer.selected">
+              {{ answer.answer }}
+            </button>
           </div>
         </div>
-      </div>
+
+        <ng-container *ngIf="questions.data && showErrorMessage">
+          <div class="alert alert-warning"
+               role="alert">
+            You did not select a valid number of questions!
+          </div>
+        </ng-container>
+
+      </ng-container>
     </div>
     <div class="col-12 text-center my-5">
-      <a [routerLink]="['/results']" class="btn btn-primary" [ngClass]="{ disabled: false }">
+      <a [routerLink]="['/results']"
+         class="btn btn-primary"
+         [ngClass]="{ disabled: false }">
         Give me my results!
       </a>
     </div>

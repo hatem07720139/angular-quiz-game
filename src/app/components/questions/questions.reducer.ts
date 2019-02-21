@@ -23,9 +23,13 @@ export const initialState: QuestionsState = questionsAdapter.getInitialState({
   error: null
 });
 
-export function startQuestionsRequest() {
+export function startQuestionsRequest(numberOfQuestions: number, difficulty: string) {
   return {
-    type: QuestionActionTypes.GetQuestionsPending
+    type: QuestionActionTypes.GetQuestionsPending,
+    payload: {
+      numberOfQuestions,
+      difficulty,
+    }
   };
 }
 
@@ -79,8 +83,8 @@ export function questionsReducer(
                 ...question,
                 answers: question.answers.map((answer, i) => {
                   return i === action.payload.buttonID
-                    ? { ...answer, answered: true }
-                    : { ...answer, answered: false };
+                    ? { ...answer, clicked: true, selected: true }
+                    : { ...answer, selected: true };
                 })
               }
             : question;
