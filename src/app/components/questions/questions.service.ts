@@ -14,8 +14,4 @@ export class QuestionsService {
     const url = `https://opentdb.com/api.php?amount=${numberOfQuestions}&difficulty=${modifyDifficulty}`;
     return this.http.get<ApiResponse>(url).pipe(map((response: ApiResponse) => response.results));
   }
-
-  selectAnswer(dummy) {
-    return dummy;
-  }
 }

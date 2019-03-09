@@ -67,14 +67,5 @@ export class QuestionsEffects {
 
   @Effect() selectAnswer$: Observable<Action> = this.actions$.pipe(
     ofType(QuestionActionTypes.StartSelectAnswer),
-    switchMap((action: SelectAnswer) => {
-      return this.questionsService
-        .selectAnswer(action.payload)
-        .pipe(
-          map(res => ({ type: QuestionActionTypes.SelectAnswer, payload: res }),
-            catchError(error => of(console.log(error)))
-          )
-        );
-    })
-  );
+    map(res => ({ type: QuestionActionTypes.SelectAnswer, payload: res })));
 }
