@@ -1,5 +1,5 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
-import { QuestionActions } from './questions.actions';
+import { CalculateTotalScore, QuestionActions } from './questions.actions';
 import { QuestionActionTypes } from './questions.constants';
 import { Answer, Question, Questions } from './questions.model';
 
@@ -7,6 +7,7 @@ export interface QuestionsState extends EntityState<Questions> {
   data: Questions;
   pending: boolean;
   error: string | null;
+  score: number;
 }
 
 export function selectAnswer(data: Questions): string {
@@ -20,7 +21,8 @@ export const questionsAdapter: EntityAdapter<Questions> = createEntityAdapter<Qu
 export const initialState: QuestionsState = questionsAdapter.getInitialState({
   data: [],
   pending: false,
-  error: null
+  error: null,
+  score: 500
 });
 
 export function startQuestionsRequest(numberOfQuestions: number, difficulty: string) {
@@ -85,15 +87,38 @@ export function questionsReducer(
           return question.id === action.payload.questionID
             ? {
               ...question,
+              points: (() => {
+                switch (question.difficulty) {
+                  case 'easy':
+                    return 10;
+                  case 'medium':
+                    return 30;
+                  case 'hard':
+                    return 50;
+                }
+              })(),
               answers: question.answers.map((answer: Answer, i: number) => {
                 return i === action.payload.buttonID
-                  ? { ...answer, clicked: true, selected: true }
-                  : { ...answer, selected: true };
+                  ? { ...answer, clicked: true, answered: true }
+                  : { ...answer, answered: true };
               })
             }
             : question;
-        })
+        }),
       };
+
+    case QuestionActionTypes.CalculateTotalScore:
+      const arr = [];
+      return {
+        ...state,
+        score: state.data.map((question: Question) => {
+          if (question.points) {
+            arr.push(question.points);
+            return arr.reduce((a, b) => a + b, 0);
+          }
+        })[0],
+      };
+
     default:
       return state;
   }

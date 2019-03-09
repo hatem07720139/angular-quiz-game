@@ -4,10 +4,10 @@ import { select, Store } from '@ngrx/store';
 import _ from 'lodash';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { ResetQuestions } from './questions.actions';
-import { Questions } from './questions.model';
+import { CalculateTotalScore, ResetQuestions } from './questions.actions';
+import { Answer, Questions } from './questions.model';
 import { selectQuestionAnswer, startQuestionsRequest } from './questions.reducer';
-import { makeSelectError, makeSelectPending, makeSelectQuestions } from './questions.selectors';
+import { makeAnswerFeedback, makeSelectError, makeSelectPending, makeSelectQuestions, makeSelectTotalScore } from './questions.selectors';
 
 @Component({
   selector: 'app-questions',
@@ -24,7 +24,8 @@ export class QuestionsComponent implements OnInit {
     difficulty: new FormControl('select a difficulty')
   });
 
-  public showErrorMessage: boolean = false;
+  public showNoQuestionsErrorMessage: boolean = false;
+  public showAnswerFeedbackMessage: string[] = [];
 
   constructor(private store: Store<{ questions: Questions }>) { }
 
@@ -43,21 +44,47 @@ export class QuestionsComponent implements OnInit {
     this.isError$ = this.store.pipe(select(makeSelectError));
   }
 
-  public clickedAnswer(questionID: number, buttonID: number): void {
+  public selectedAnswer(questionID: number, buttonID: number): void {
     this.store.dispatch(selectQuestionAnswer(questionID, buttonID));
+
+    const correctAnswerMessages: string[] = [
+      'Correct answer!',
+      `Wow, you're smart ;)`,
+      'Come on, you must be cheating!',
+      'How did you know?!'
+    ];
+
+    const wrongAnswerMessages: string[] = [
+      'ohh too bad!',
+      `Try again next time :P`,
+      'WRONG!',
+      'You stupid or what?!'
+    ];
+
+    this.store.pipe(select(makeAnswerFeedback(questionID))).subscribe(
+      (correctAnswer: Answer[]) => {
+        const isCorrect = correctAnswer.find((answer: Answer) => answer.isCorrect === answer.clicked);
+
+        this.showAnswerFeedbackMessage[questionID] = isCorrect
+          ? correctAnswerMessages[Math.floor(Math.random() * correctAnswerMessages.length)]
+          : wrongAnswerMessages[Math.floor(Math.random() * wrongAnswerMessages.length)];
+      }
+    );
+
+    this.store.dispatch(new CalculateTotalScore);
   }
 
   private checkForNumberOfQuestionsChange(): void {
     this.userSettings.valueChanges.pipe(
-      debounceTime(300),
+      debounceTime(500),
       distinctUntilChanged(_.isEqual))
       .subscribe((userSettings) => {
         if (!userSettings.numberOfQuestions) {
-          this.showErrorMessage = true;
+          this.showNoQuestionsErrorMessage = true;
         } else {
-          this.showErrorMessage = false;
-          this.userSettings.get('numberOfQuestions').setValue(userSettings.numberOfQuestions, {emitEvent: false});
-          this.userSettings.get('difficulty').setValue(userSettings.difficulty, {emitEvent: false});
+          this.showNoQuestionsErrorMessage = false;
+          this.userSettings.get('numberOfQuestions').setValue(userSettings.numberOfQuestions, { emitEvent: false });
+          this.userSettings.get('difficulty').setValue(userSettings.difficulty, { emitEvent: false });
           this.store.dispatch(new ResetQuestions);
           this.dispatchQuestionsRequest();
         }

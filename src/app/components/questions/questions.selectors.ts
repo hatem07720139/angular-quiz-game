@@ -17,3 +17,13 @@ export const makeSelectError = createSelector(
   getQuestionsState,
   (state: QuestionsState) => state.error
 );
+
+export const makeAnswerFeedback = (questionID: number) => createSelector(
+  getQuestionsState,
+  (state: QuestionsState) => state.data[questionID].answers
+);
+
+export const makeSelectTotalScore = createSelector(
+  getQuestionsState,
+  (state: QuestionsState) => state.score
+);

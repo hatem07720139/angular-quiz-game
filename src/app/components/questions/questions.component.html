@@ -5,7 +5,7 @@
         <div class="card-body">
           <form [formGroup]="userSettings">
             <div class="row">
-              <div class="col-6">
+              <div class="col-12 col-sm-6">
                 <div class="form-group">
                   <label for="number-of-questions">Number of Questions</label>
                   <input type="number"
@@ -15,7 +15,7 @@
                          formControlName="numberOfQuestions">
                 </div>
               </div>
-              <div class="col-6">
+              <div class="col-12 col-sm-6">
                 <div class="form-group">
                   <label for="difficulty">Difficulty</label>
                   <select class="form-control"
@@ -50,22 +50,30 @@
             <h5 class="card-title">Category: {{ question.category }}</h5>
             <h6 class="card-subtitle mb-2 text-muted">Difficulty: {{ question.difficulty }}</h6>
             <p class="card-text">{{ question.question }}</p>
+
             <button class="btn mr-2 mb-2"
                     *ngFor="let answer of question.answers; let buttonID = index"
                     [ngClass]="{
-                'btn-secondary': !answer.selected,
-                'btn-danger': !answer.isCorrect && answer.selected,
-                'btn-success': answer.isCorrect && answer.selected
+                'btn-secondary': !answer.answered,
+                'btn-danger': !answer.isCorrect && answer.answered,
+                'btn-success': answer.isCorrect && answer.answered
               }"
-                    (click)="clickedAnswer(question.id, buttonID)"
-                    [disabled]="answer.selected">
+                    (click)="selectedAnswer(question.id, buttonID)"
+                    [disabled]="answer.answered">
               {{ answer.answer }}
             </button>
+
+            <!-- <ng-container *ngIf="showAnswerFeedbackMessage[question.id]">
+              <div class="alert alert-info">
+                {{showAnswerFeedbackMessage[question.id]}}
+              </div>
+            </ng-container> -->
+
           </div>
         </div>
       </ng-container>
 
-      <ng-container *ngIf="showErrorMessage">
+      <ng-container *ngIf="showNoQuestionsErrorMessage">
         <div class="alert alert-warning"
              role="alert">
           You did not select a valid number of questions!

@@ -5,19 +5,19 @@ import { Questions } from './questions.model';
 export class StartQuestionsRequest implements Action {
   readonly type = QuestionActionTypes.StartQuestionsRequest;
 
-  constructor(public payload: { numberOfQuestions: number, difficulty: string }) {}
+  constructor(public payload: { numberOfQuestions: number, difficulty: string }) { }
 }
 
 export class GetQuestionsSuccess implements Action {
   readonly type = QuestionActionTypes.GetQuestionsSuccess;
 
-  constructor(public payload: Questions) {}
+  constructor(public payload: Questions) { }
 }
 
 export class GetQuestionsError implements Action {
   readonly type = QuestionActionTypes.GetQuestionsError;
 
-  constructor(public payload: { error: string }) {}
+  constructor(public payload: { error: string }) { }
 }
 
 export class ResetQuestions implements Action {
@@ -31,7 +31,11 @@ export class StartSelectAnswer implements Action {
 export class SelectAnswer implements Action {
   readonly type = QuestionActionTypes.SelectAnswer;
 
-  constructor(public payload: { questionID: number; buttonID: number }) {}
+  constructor(public payload: { questionID: number; buttonID: number }) { }
+}
+
+export class CalculateTotalScore implements Action {
+  readonly type = QuestionActionTypes.CalculateTotalScore;
 }
 
 export type QuestionActions =
@@ -39,5 +43,6 @@ export type QuestionActions =
   | GetQuestionsSuccess
   | GetQuestionsError
   | ResetQuestions
+  | CalculateTotalScore
   | StartSelectAnswer
   | SelectAnswer;

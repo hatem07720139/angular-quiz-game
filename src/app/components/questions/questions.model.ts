@@ -7,6 +7,7 @@ export interface Question {
   incorrect_answers: string[];
   answers?: Answer[];
   id?: number;
+  points?: number;
 }
 
 export interface Questions extends Array<Question> {}
@@ -19,7 +20,8 @@ export interface ApiResponse {
 export interface Answer {
   answer: string;
   isCorrect: boolean;
-  selected?: boolean;
+  clicked?: boolean;
+  answered?: boolean;
 }
 
 export interface HTMLEntity {

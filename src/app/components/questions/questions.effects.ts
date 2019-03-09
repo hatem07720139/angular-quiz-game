@@ -21,7 +21,8 @@ export class QuestionsEffects {
     '&uacute;': 'ú',
     '&amp;': '&',
     '&divide;': '÷',
-    '&times;': '×'
+    '&times;': '×',
+    '&ldquo;': '"'
   };
 
   constructor(private actions$: Actions, private questionsService: QuestionsService, private store: Store<QuestionsState>) { }
