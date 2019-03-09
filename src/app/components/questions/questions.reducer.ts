@@ -1,10 +1,10 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 import { QuestionActions } from './questions.actions';
 import { QuestionActionTypes } from './questions.constants';
-import { Questions } from './questions.model';
+import { Answer, Question, Questions } from './questions.model';
 
 export interface QuestionsState extends EntityState<Questions> {
-  data: Questions | any;
+  data: Questions;
   pending: boolean;
   error: string | null;
 }
@@ -25,7 +25,7 @@ export const initialState: QuestionsState = questionsAdapter.getInitialState({
 
 export function startQuestionsRequest(numberOfQuestions: number, difficulty: string) {
   return {
-    type: QuestionActionTypes.GetQuestionsPending,
+    type: QuestionActionTypes.StartQuestionsRequest,
     payload: {
       numberOfQuestions,
       difficulty,
@@ -48,7 +48,7 @@ export function questionsReducer(
   action: QuestionActions
 ): QuestionsState {
   switch (action.type) {
-    case QuestionActionTypes.GetQuestionsPending:
+    case QuestionActionTypes.StartQuestionsRequest:
       return {
         ...state,
         pending: true,
@@ -68,6 +68,10 @@ export function questionsReducer(
         pending: false,
         error: action.payload.error
       };
+
+    case QuestionActionTypes.ResetQuestions:
+      return initialState;
+
     case QuestionActionTypes.StartSelectAnswer:
       return {
         ...state,
@@ -77,16 +81,16 @@ export function questionsReducer(
     case QuestionActionTypes.SelectAnswer:
       return {
         ...state,
-        data: state.data.map(question => {
+        data: state.data.map((question: Question) => {
           return question.id === action.payload.questionID
             ? {
-                ...question,
-                answers: question.answers.map((answer, i) => {
-                  return i === action.payload.buttonID
-                    ? { ...answer, clicked: true, selected: true }
-                    : { ...answer, selected: true };
-                })
-              }
+              ...question,
+              answers: question.answers.map((answer: Answer, i: number) => {
+                return i === action.payload.buttonID
+                  ? { ...answer, clicked: true, selected: true }
+                  : { ...answer, selected: true };
+              })
+            }
             : question;
         })
       };

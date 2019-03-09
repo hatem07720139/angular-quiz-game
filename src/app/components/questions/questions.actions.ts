@@ -2,8 +2,10 @@ import { Action } from '@ngrx/store';
 import { QuestionActionTypes } from './questions.constants';
 import { Questions } from './questions.model';
 
-export class GetQuestionsPending implements Action {
-  readonly type = QuestionActionTypes.GetQuestionsPending;
+export class StartQuestionsRequest implements Action {
+  readonly type = QuestionActionTypes.StartQuestionsRequest;
+
+  constructor(public payload: { numberOfQuestions: number, difficulty: string }) {}
 }
 
 export class GetQuestionsSuccess implements Action {
@@ -18,6 +20,10 @@ export class GetQuestionsError implements Action {
   constructor(public payload: { error: string }) {}
 }
 
+export class ResetQuestions implements Action {
+  readonly type = QuestionActionTypes.ResetQuestions;
+}
+
 export class StartSelectAnswer implements Action {
   readonly type = QuestionActionTypes.StartSelectAnswer;
 }
@@ -29,8 +35,9 @@ export class SelectAnswer implements Action {
 }
 
 export type QuestionActions =
-  | GetQuestionsPending
+  | StartQuestionsRequest
   | GetQuestionsSuccess
   | GetQuestionsError
+  | ResetQuestions
   | StartSelectAnswer
   | SelectAnswer;

@@ -1,43 +1,50 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Action } from '@ngrx/store';
-import { Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { Action, select, Store } from '@ngrx/store';
+import { empty, Observable, of } from 'rxjs';
+import { catchError, filter, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import * as shuffle from 'shuffle-array';
-import { GetQuestionsError, GetQuestionsSuccess, SelectAnswer } from './questions.actions';
+import { GetQuestionsError, GetQuestionsSuccess, SelectAnswer, StartQuestionsRequest } from './questions.actions';
 import { QuestionActionTypes } from './questions.constants';
-import { Questions } from './questions.model';
+import { ApiResponse, HTMLEntity, Question, Questions } from './questions.model';
+import { QuestionsState } from './questions.reducer';
+import { makeSelectQuestions } from './questions.selectors';
 import { QuestionsService } from './questions.service';
 
 @Injectable()
 export class QuestionsEffects {
-  private entities = {
+  private entities: HTMLEntity = {
     '&#039;': '\'',
     '&quot;': '"',
     '&eacute;': 'é',
     '&aacute;': 'á',
     '&uacute;': 'ú',
-    '&amp;': '&'
+    '&amp;': '&',
+    '&divide;': '÷',
+    '&times;': '×'
   };
 
-  constructor(private actions$: Actions, private questionsService: QuestionsService) { }
+  constructor(private actions$: Actions, private questionsService: QuestionsService, private store: Store<QuestionsState>) { }
 
   @Effect() getQuestions$: Observable<Action> = this.actions$.pipe(
-    ofType(QuestionActionTypes.GetQuestionsPending),
-    switchMap((action: any) => this.questionsService.getAllQuestions(action.payload.numberOfQuestions, action.payload.difficulty)
+    ofType<StartQuestionsRequest>(QuestionActionTypes.StartQuestionsRequest),
+    withLatestFrom(this.store.pipe(select(makeSelectQuestions))),
+    filter((questions) => !!questions),
+    switchMap(([action]) => this.questionsService.getAllQuestions(action.payload.numberOfQuestions,
+      action.payload.difficulty)
       .pipe(
-        map((questions: any) => {
-          const modified: Questions = questions.results.map((elem, i) => {
+        map((questions: Questions) => {
+          const modified: Questions = questions.map((question: Question, i: number) => {
             const tmp = {
-              ...elem,
+              ...question,
               id: i,
               answers: [
                 {
-                  answer: elem.correct_answer.replace(/&#?\w+;/g, match => this.entities[match]),
+                  answer: question.correct_answer.replace(/&#?\w+;/g, match => this.entities[match]),
                   isCorrect: true
                 }
               ].concat(
-                elem.incorrect_answers.map(incorrect_answer => {
+                question.incorrect_answers.map((incorrect_answer: string) => {
                   return {
                     answer: incorrect_answer.replace(/&#?\w+;/g, match => this.entities[match]),
                     isCorrect: false
@@ -46,6 +53,8 @@ export class QuestionsEffects {
               )
             };
             tmp.question = tmp.question.replace(/&#?\w+;/g, match => this.entities[match]);
+            delete tmp.correct_answer;
+            delete tmp.incorrect_answers;
             shuffle(tmp.answers);
             return tmp;
           });
@@ -61,9 +70,8 @@ export class QuestionsEffects {
       return this.questionsService
         .selectAnswer(action.payload)
         .pipe(
-          map(
-            res => ({ type: QuestionActionTypes.SelectAnswer, payload: res }),
-            catchError(error => of(console.log(111, error)))
+          map(res => ({ type: QuestionActionTypes.SelectAnswer, payload: res }),
+            catchError(error => of(console.log(error)))
           )
         );
     })

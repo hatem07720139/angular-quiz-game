@@ -6,12 +6,22 @@ export interface Question {
   correct_answer: string;
   incorrect_answers: string[];
   answers?: Answer[];
+  id?: number;
 }
 
-interface Answer {
+export interface Questions extends Array<Question> {}
+
+export interface ApiResponse {
+  response_code?: number;
+  results: Array<Question>;
+}
+
+export interface Answer {
   answer: string;
   isCorrect: boolean;
   selected?: boolean;
 }
 
-export interface Questions extends Array<Question> {}
+export interface HTMLEntity {
+  [entity: string]: string;
+}
