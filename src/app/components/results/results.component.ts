@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { QuestionsState } from '../questions/questions.reducer';
+import { makeSelectMaxPossibleScore, makeSelectTotalScore } from '../questions/questions.selectors';
 
 @Component({
   selector: 'app-results',
@@ -8,7 +10,13 @@ import { Observable } from 'rxjs';
   styleUrls: ['./results.component.scss']
 })
 export class ResultsComponent implements OnInit {
-  constructor(private store: Store<{}>) {}
+  public totalScore$: Observable<number>;
+  public maxPossibleScore$: Observable<number>;
 
-  public ngOnInit(): void {}
+  constructor(private store: Store<QuestionsState>) {}
+
+  public ngOnInit(): void {
+    this.totalScore$ = this.store.pipe(select(makeSelectTotalScore));
+    this.maxPossibleScore$ = this.store.pipe(select(makeSelectMaxPossibleScore));
+  }
 }

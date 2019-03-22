@@ -1,3 +1,9 @@
 <div class="container">
-  <div class="row"><div class="col-12">Results Page!</div></div>
+  <div class="row">
+    <div class="col-12">
+      <div class="jumbotron">
+        Your final Score: {{ totalScore$ | async }}/{{ maxPossibleScore$ | async }}
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,5 +1,5 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
-import { CalculateTotalScore, QuestionActions } from './questions.actions';
+import { QuestionActions } from './questions.actions';
 import { QuestionActionTypes } from './questions.constants';
 import { Answer, Question, Questions } from './questions.model';
 
@@ -8,6 +8,7 @@ export interface QuestionsState extends EntityState<Questions> {
   pending: boolean;
   error: string | null;
   score: number;
+  maxScore: number;
 }
 
 export function selectAnswer(data: Questions): string {
@@ -22,7 +23,8 @@ export const initialState: QuestionsState = questionsAdapter.getInitialState({
   data: [],
   pending: false,
   error: null,
-  score: 500
+  score: 0,
+  maxScore: 0
 });
 
 export function startQuestionsRequest(numberOfQuestions: number, difficulty: string) {
@@ -30,7 +32,7 @@ export function startQuestionsRequest(numberOfQuestions: number, difficulty: str
     type: QuestionActionTypes.StartQuestionsRequest,
     payload: {
       numberOfQuestions,
-      difficulty,
+      difficulty
     }
   };
 }
@@ -56,6 +58,7 @@ export function questionsReducer(
         pending: true,
         error: null
       };
+
     case QuestionActionTypes.GetQuestionsSuccess:
       return {
         ...state,
@@ -80,43 +83,48 @@ export function questionsReducer(
         pending: true,
         error: null
       };
+
     case QuestionActionTypes.SelectAnswer:
       return {
         ...state,
         data: state.data.map((question: Question) => {
           return question.id === action.payload.questionID
             ? {
-              ...question,
-              points: (() => {
-                switch (question.difficulty) {
-                  case 'easy':
-                    return 10;
-                  case 'medium':
-                    return 30;
-                  case 'hard':
-                    return 50;
-                }
-              })(),
-              answers: question.answers.map((answer: Answer, i: number) => {
-                return i === action.payload.buttonID
-                  ? { ...answer, clicked: true, answered: true }
-                  : { ...answer, answered: true };
-              })
-            }
+                ...question,
+                points: (() => {
+                  switch (question.difficulty) {
+                    case 'easy':
+                      return 10;
+                    case 'medium':
+                      return 30;
+                    case 'hard':
+                      return 50;
+                  }
+                })(),
+                answers: question.answers.map((answer: Answer, i: number) => {
+                  return i === action.payload.buttonID
+                    ? { ...answer, clicked: true, answered: true }
+                    : { ...answer, answered: true };
+                })
+              }
             : question;
-        }),
+        })
       };
 
     case QuestionActionTypes.CalculateTotalScore:
-      const arr = [];
       return {
         ...state,
-        score: state.data.map((question: Question) => {
-          if (question.points) {
-            arr.push(question.points);
-            return arr.reduce((a, b) => a + b, 0);
-          }
-        })[0],
+        score: state.data
+          .map((question: Question) => (question.points ? question.points : 0))
+          .reduce((a: number, b: number) => a + b, 0)
+      };
+
+    case QuestionActionTypes.CalculateMaxPossibleScore:
+      return {
+        ...state,
+        maxScore: state.data
+          .map((question: Question) => (question.points ? question.points : 0))
+          .reduce((a: number, b: number) => a + b, 0)
       };
 
     default:

@@ -18,12 +18,18 @@ export const makeSelectError = createSelector(
   (state: QuestionsState) => state.error
 );
 
-export const makeAnswerFeedback = (questionID: number) => createSelector(
-  getQuestionsState,
-  (state: QuestionsState) => state.data[questionID].answers
-);
+export const makeAnswerFeedback = (questionID: number) =>
+  createSelector(
+    getQuestionsState,
+    (state: QuestionsState) => state.data[questionID].answers
+  );
 
 export const makeSelectTotalScore = createSelector(
   getQuestionsState,
   (state: QuestionsState) => state.score
+);
+
+export const makeSelectMaxPossibleScore = createSelector(
+  getQuestionsState,
+  (state: QuestionsState) => state.maxScore
 );

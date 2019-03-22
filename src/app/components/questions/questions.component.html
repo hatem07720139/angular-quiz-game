@@ -8,85 +8,100 @@
               <div class="col-12 col-sm-6">
                 <div class="form-group">
                   <label for="number-of-questions">Number of Questions</label>
-                  <input type="number"
-                         name="number-of-questions"
-                         id="number-of-questions"
-                         class="form-control"
-                         formControlName="numberOfQuestions">
+                  <input
+                    type="number"
+                    name="number-of-questions"
+                    id="number-of-questions"
+                    class="form-control"
+                    formControlName="numberOfQuestions"
+                  />
+                </div>
+                <div
+                  class="alert alert-warning"
+                  role="alert"
+                  *ngIf="userSettings.controls['numberOfQuestions'].errors?.required"
+                >
+                  Number of Questions is required
+                </div>
+                <div
+                  class="alert alert-info"
+                  role="alert"
+                  *ngIf="userSettings.controls['numberOfQuestions'].errors?.min"
+                >
+                  Number of Questions should be at least 1
                 </div>
               </div>
               <div class="col-12 col-sm-6">
                 <div class="form-group">
                   <label for="difficulty">Difficulty</label>
-                  <select class="form-control"
-                          id="difficulty"
-                          formControlName="difficulty">
-                    <option selected
-                            hidden>select a difficulty</option>
+                  <select class="form-control" id="difficulty" formControlName="difficulty">
+                    <option selected hidden>select a difficulty</option>
                     <option>easy</option>
                     <option>medium</option>
                     <option>hard</option>
                   </select>
                 </div>
               </div>
+              <div class="col-12">
+                <button
+                  class="btn btn-secondary"
+                  (click)="reloadQuestions()"
+                  [disabled]="isLoading$ | async"
+                >
+                  give me new Questions
+                </button>
+              </div>
             </div>
           </form>
         </div>
       </div>
 
-      <ng-container *ngIf="isLoading$ | async">
-        <img src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif"
-             alt="Double Ring Loading Spinner"
-             class="center-loading-indicator" />
+      <ng-container *ngIf="(isLoading$ | async)">
+        <img
+          src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif"
+          alt="Double Ring Loading Spinner"
+          class="center-loading-indicator"
+        />
       </ng-container>
 
-      <ng-container *ngIf="isError$ | async">{{ isError$ | async }}</ng-container>
+      <ng-container *ngIf="(isError$ | async)">{{ isError$ | async }}</ng-container>
 
       <ng-container *ngIf="!showErrorMessage && (questions$ | async) as questions">
-        <div class="card my-3"
-             *ngFor="let question of questions">
+        <div class="card my-3" *ngFor="let question of questions">
           <div class="question-number">#{{ question.id + 1 }}</div>
           <div class="card-body">
             <h5 class="card-title">Category: {{ question.category }}</h5>
             <h6 class="card-subtitle mb-2 text-muted">Difficulty: {{ question.difficulty }}</h6>
             <p class="card-text">{{ question.question }}</p>
 
-            <button class="btn mr-2 mb-2"
-                    *ngFor="let answer of question.answers; let buttonID = index"
-                    [ngClass]="{
+            <button
+              class="btn mr-2 mb-2"
+              *ngFor="let answer of question.answers; let buttonID = index"
+              [ngClass]="{
                 'btn-secondary': !answer.answered,
                 'btn-danger': !answer.isCorrect && answer.answered,
                 'btn-success': answer.isCorrect && answer.answered
               }"
-                    (click)="selectedAnswer(question.id, buttonID)"
-                    [disabled]="answer.answered">
+              (click)="selectedAnswer(question.id, buttonID)"
+              [disabled]="answer.answered"
+            >
               {{ answer.answer }}
             </button>
 
+            <!-- INFO: message feedback alerts, not used currently, would need color configuration -->
             <!-- <ng-container *ngIf="showAnswerFeedbackMessage[question.id]">
               <div class="alert alert-info">
-                {{showAnswerFeedbackMessage[question.id]}}
+                {{ showAnswerFeedbackMessage[question.id] }}
               </div>
             </ng-container> -->
-
           </div>
         </div>
-      </ng-container>
-
-      <ng-container *ngIf="showNoQuestionsErrorMessage">
-        <div class="alert alert-warning"
-             role="alert">
-          You did not select a valid number of questions!
+        <div *ngIf="questions.length" class="col-12 text-center my-5">
+          <a [routerLink]="['/results']" class="btn btn-success">
+            Give me my results!
+          </a>
         </div>
       </ng-container>
-
-    </div>
-    <div class="col-12 text-center my-5">
-      <a [routerLink]="['/results']"
-         class="btn btn-primary"
-         [ngClass]="{ disabled: false }">
-        Give me my results!
-      </a>
     </div>
   </div>
 </div>

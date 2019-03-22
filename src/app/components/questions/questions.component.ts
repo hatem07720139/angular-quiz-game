@@ -1,13 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
-import _ from 'lodash';
+import { isEqual } from 'lodash-es';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { CalculateTotalScore, ResetQuestions } from './questions.actions';
+import {
+  CalculateMaxPossibleScore,
+  CalculateTotalScore,
+  ResetQuestions
+} from './questions.actions';
 import { Answer, Questions } from './questions.model';
-import { selectQuestionAnswer, startQuestionsRequest } from './questions.reducer';
-import { makeAnswerFeedback, makeSelectError, makeSelectPending, makeSelectQuestions, makeSelectTotalScore } from './questions.selectors';
+import { QuestionsState, selectQuestionAnswer, startQuestionsRequest } from './questions.reducer';
+import {
+  makeAnswerFeedback,
+  makeSelectError,
+  makeSelectPending,
+  makeSelectQuestions
+} from './questions.selectors';
 
 @Component({
   selector: 'app-questions',
@@ -24,10 +33,9 @@ export class QuestionsComponent implements OnInit {
     difficulty: new FormControl('select a difficulty')
   });
 
-  public showNoQuestionsErrorMessage: boolean = false;
   public showAnswerFeedbackMessage: string[] = [];
 
-  constructor(private store: Store<{ questions: Questions }>) { }
+  constructor(private store: Store<QuestionsState>) {}
 
   public ngOnInit(): void {
     this.dispatchQuestionsRequest();
@@ -35,9 +43,11 @@ export class QuestionsComponent implements OnInit {
   }
 
   private dispatchQuestionsRequest(): void {
-    this.store.dispatch(startQuestionsRequest(
-      this.userSettings.get('numberOfQuestions').value,
-      this.userSettings.get('difficulty').value)
+    this.store.dispatch(
+      startQuestionsRequest(
+        this.userSettings.get('numberOfQuestions').value,
+        this.userSettings.get('difficulty').value
+      )
     );
     this.questions$ = this.store.pipe(select(makeSelectQuestions));
     this.isLoading$ = this.store.pipe(select(makeSelectPending));
@@ -61,33 +71,46 @@ export class QuestionsComponent implements OnInit {
       'You stupid or what?!'
     ];
 
-    this.store.pipe(select(makeAnswerFeedback(questionID))).subscribe(
-      (correctAnswer: Answer[]) => {
-        const isCorrect = correctAnswer.find((answer: Answer) => answer.isCorrect === answer.clicked);
+    this.store.pipe(select(makeAnswerFeedback(questionID))).subscribe((correctAnswer: Answer[]) => {
+      const isCorrect = correctAnswer.find((answer: Answer) => answer.isCorrect === answer.clicked);
 
-        this.showAnswerFeedbackMessage[questionID] = isCorrect
-          ? correctAnswerMessages[Math.floor(Math.random() * correctAnswerMessages.length)]
-          : wrongAnswerMessages[Math.floor(Math.random() * wrongAnswerMessages.length)];
+      if (isCorrect) {
+        this.showAnswerFeedbackMessage[questionID] =
+          correctAnswerMessages[Math.floor(Math.random() * correctAnswerMessages.length)];
+
+        this.store.dispatch(new CalculateTotalScore());
+        this.store.dispatch(new CalculateMaxPossibleScore());
+      } else {
+        this.showAnswerFeedbackMessage[questionID] =
+          wrongAnswerMessages[Math.floor(Math.random() * wrongAnswerMessages.length)];
+
+        this.store.dispatch(new CalculateMaxPossibleScore());
       }
-    );
-
-    this.store.dispatch(new CalculateTotalScore);
+    });
   }
 
   private checkForNumberOfQuestionsChange(): void {
-    this.userSettings.valueChanges.pipe(
-      debounceTime(500),
-      distinctUntilChanged(_.isEqual))
-      .subscribe((userSettings) => {
-        if (!userSettings.numberOfQuestions) {
-          this.showNoQuestionsErrorMessage = true;
-        } else {
-          this.showNoQuestionsErrorMessage = false;
-          this.userSettings.get('numberOfQuestions').setValue(userSettings.numberOfQuestions, { emitEvent: false });
-          this.userSettings.get('difficulty').setValue(userSettings.difficulty, { emitEvent: false });
-          this.store.dispatch(new ResetQuestions);
+    this.userSettings.valueChanges
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged(isEqual)
+      )
+      .subscribe(userSettings => {
+        this.store.dispatch(new ResetQuestions());
+        if (userSettings.numberOfQuestions) {
+          this.userSettings
+            .get('numberOfQuestions')
+            .setValue(userSettings.numberOfQuestions, { emitEvent: false });
+          this.userSettings
+            .get('difficulty')
+            .setValue(userSettings.difficulty, { emitEvent: false });
           this.dispatchQuestionsRequest();
         }
       });
+  }
+
+  public reloadQuestions(): void {
+    this.store.dispatch(new ResetQuestions());
+    this.dispatchQuestionsRequest();
   }
 }

@@ -23,7 +23,3 @@ export interface Answer {
   clicked?: boolean;
   answered?: boolean;
 }
-
-export interface HTMLEntity {
-  [entity: string]: string;
-}

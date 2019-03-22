@@ -5,5 +5,6 @@ export enum QuestionActionTypes {
   ResetQuestions = 'ResetQuestions',
   StartSelectAnswer = 'StartSelectAnswer',
   SelectAnswer = 'SelectAnswer',
-  CalculateTotalScore = 'CalculateTotalScore'
+  CalculateTotalScore = 'CalculateTotalScore',
+  CalculateMaxPossibleScore = 'CalculateMaxPossibleScore'
 }
